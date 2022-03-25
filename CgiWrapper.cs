@@ -5,14 +5,16 @@ using System.Text;
 
 namespace Gemini.Cgi
 {
-	public class CgiWrapper
+	public class CgiWrapper : IDisposable
 	{
 		public bool HasQuery
 			=> (Query.Length > 0);
 
-		public TextWriter Out { get; private set; }
+        public Stream Out { get; private set; }
 
-		public string PathInfo
+        public StreamWriter Writer { get; private set; }
+
+        public string PathInfo
 			=> Environment.GetEnvironmentVariable("PATH_INFO") ?? "";
 
 		public string Query
@@ -28,9 +30,15 @@ namespace Gemini.Cgi
 
         public CgiWrapper()
 		{
-            Out = Console.Out;
-			RequestUrl = new Uri(Environment.GetEnvironmentVariable("GEMINI_URL") ?? "");
+            Out = Console.OpenStandardOutput();
+            Writer = new StreamWriter(Out, new UTF8Encoding(false));
+            //Writer.AutoFlush = true;
+            RequestUrl = new Uri(Environment.GetEnvironmentVariable("GEMINI_URL") ?? "about:blank");
 		}
+
+        //for gemini, its just about removing the new lines
+        public string SantiziedQuery
+            => Query.Trim().Replace("\n", " ").Replace("\r", " ");
 
         public void Input(string prompt)
             => WriteStatusLine(10, prompt);
@@ -48,12 +56,16 @@ namespace Gemini.Cgi
             => WriteStatusLine(59, msg);
 
         private void WriteStatusLine(int statusCode, string msg)
-            => Write($"{statusCode} {msg}\r\n");
+            //implement as directly writing bytes
+            => Out.Write(Encoding.UTF8.GetBytes($"{statusCode} {msg}\r\n"));
 
-        public void Write(string text)
-            => Out.Write(text);
+        public void Dispose()
+        {
+            Writer.Flush();
+            Writer.Dispose();
+        }
 
-        public void WriteLine(string text = "")
-            => Out.WriteLine(text);
+        public static bool IsRunningAsCgi
+            => (Environment.GetEnvironmentVariable("GEMINI_URL") != null);
     }
 }
