@@ -16,22 +16,23 @@ namespace Gemini.Cgi
 
         public void ProcessRequest()
         {
-            var cgiWrapper = new CgiWrapper();
-
-            //find the route
-            var callback = FindRoute(cgiWrapper.PathInfo);
-            if (callback != null)
+            using (var cgiWrapper = new CgiWrapper())
             {
-                callback(cgiWrapper);
-                return;
+                //find the route
+                var callback = FindRoute(cgiWrapper.PathInfo);
+                if (callback != null)
+                {
+                    callback(cgiWrapper);
+                    return;
+                }
+                HandleMissedRoute(cgiWrapper);
             }
-            HandleMissedRoute(cgiWrapper);
         }
 
         private void HandleMissedRoute(CgiWrapper cgiWrapper)
         {
             cgiWrapper.Success();
-            cgiWrapper.WriteLine("No routes");
+            cgiWrapper.Writer.WriteLine("No routes for request");
         }
 
         /// <summary>
@@ -43,6 +44,9 @@ namespace Gemini.Cgi
         private RequestCallback? FindRoute(string route)
             => routeCallbacks.Where(x => route.StartsWith(x.Item1))
                 .Select(x => x.Item2).FirstOrDefault();
+
+
+
 
     }
 }
