@@ -18,14 +18,21 @@ namespace Gemini.Cgi
         {
             using (var cgiWrapper = new CgiWrapper())
             {
-                //find the route
-                var callback = FindRoute(cgiWrapper.PathInfo);
-                if (callback != null)
+                try
                 {
-                    callback(cgiWrapper);
-                    return;
+                    //find the route
+                    var callback = FindRoute(cgiWrapper.PathInfo);
+                    if (callback != null)
+                    {
+                        callback(cgiWrapper);
+                        return;
+                    }
+                    HandleMissedRoute(cgiWrapper);
+                } catch(Exception ex)
+                {
+                    HandleException(cgiWrapper, ex.Message);
+                    cgiWrapper.Writer.WriteLine(ex.StackTrace);
                 }
-                HandleMissedRoute(cgiWrapper);
             }
         }
 
@@ -33,6 +40,11 @@ namespace Gemini.Cgi
         {
             cgiWrapper.Success();
             cgiWrapper.Writer.WriteLine("No routes for request");
+        }
+
+        private void HandleException(CgiWrapper cgiWrapper, string msg)
+        {
+            cgiWrapper.BadRequest($"Encountered an exception: {msg}");
         }
 
         /// <summary>
@@ -44,9 +56,5 @@ namespace Gemini.Cgi
         private RequestCallback? FindRoute(string route)
             => routeCallbacks.Where(x => route.StartsWith(x.Item1))
                 .Select(x => x.Item2).FirstOrDefault();
-
-
-
-
     }
 }
