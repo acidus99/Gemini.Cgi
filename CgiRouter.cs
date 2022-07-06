@@ -8,7 +8,6 @@ namespace Gemini.Cgi
 
     public class CgiRouter
     {
-
         private readonly List<Tuple<string, RequestCallback>> routeCallbacks = new List<Tuple<string, RequestCallback>>();
 
         public void OnRequest(string route, RequestCallback callback)
