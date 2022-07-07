@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+
 using System.Linq;
 
 namespace Gemini.Cgi
@@ -9,9 +12,15 @@ namespace Gemini.Cgi
     public class CgiRouter
     {
         private readonly List<Tuple<string, RequestCallback>> routeCallbacks = new List<Tuple<string, RequestCallback>>();
+        private StaticFileModule staticModule = null;
 
         public void OnRequest(string route, RequestCallback callback)
             => routeCallbacks.Add(new Tuple<string, RequestCallback>(route.ToLower(), callback));
+
+        public void SetStaticRoot(string relativeDir)
+        {
+            staticModule = new StaticFileModule(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), relativeDir));
+        }
 
         public void ProcessRequest()
         {
@@ -24,6 +33,11 @@ namespace Gemini.Cgi
                     if (callback != null)
                     {
                         callback(cgiWrapper);
+                        return;
+                    }
+                    //do we have a static module registered, and was it able to service the request?
+                    if(staticModule != null && staticModule.HandleRequest(cgiWrapper))
+                    {
                         return;
                     }
                     HandleMissedRoute(cgiWrapper);
