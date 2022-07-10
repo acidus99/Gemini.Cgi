@@ -14,8 +14,19 @@ namespace Gemini.Cgi
         private readonly List<Tuple<string, RequestCallback>> routeCallbacks = new List<Tuple<string, RequestCallback>>();
         private StaticFileModule staticModule = null;
 
+        private RequestCallback defaultRoute = null;
+
         public void OnRequest(string route, RequestCallback callback)
-            => routeCallbacks.Add(new Tuple<string, RequestCallback>(route.ToLower(), callback));
+        {
+            if (route is "")
+            {
+                defaultRoute = callback;
+            }
+            else
+            {
+                routeCallbacks.Add(new Tuple<string, RequestCallback>(route.ToLower(), callback));
+            }
+        }
 
         public void SetStaticRoot(string relativeDir)
         {
@@ -38,6 +49,14 @@ namespace Gemini.Cgi
                     //do we have a static module registered, and was it able to service the request?
                     if(staticModule != null && staticModule.HandleRequest(cgiWrapper))
                     {
+                        return;
+                    }
+
+                    //finally check default route. If this happens before we check the static module,
+                    //we won't ever server a static file
+                    if(defaultRoute != null && cgiWrapper.PathInfo is "")
+                    {
+                        defaultRoute(cgiWrapper);
                         return;
                     }
                     HandleMissedRoute(cgiWrapper);
