@@ -16,6 +16,18 @@ namespace Gemini.Cgi
 
         private RequestCallback defaultRoute = null;
 
+        private Action<CgiWrapper> ParsingCallback;
+
+        /// <summary>
+        /// Provide an optional callback which is called on incoming requests
+        /// helpful for parsing and the nsetting additional variables
+        /// </summary>
+        /// <param name="parsingCallback"></param>
+        public CgiRouter(Action<CgiWrapper> parsingCallback = null)
+        {
+            ParsingCallback = parsingCallback;
+        }
+
         public void OnRequest(string route, RequestCallback callback)
         {
             if (route is "")
@@ -39,6 +51,10 @@ namespace Gemini.Cgi
             {
                 try
                 {
+                    if(ParsingCallback != null)
+                    {
+                        ParsingCallback(cgiWrapper);
+                    }
                     //find the route
                     var callback = FindRoute(cgiWrapper.PathInfo);
                     if (callback != null)
