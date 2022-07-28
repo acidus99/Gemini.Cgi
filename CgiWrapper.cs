@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 
 namespace Gemini.Cgi
 {
 	public class CgiWrapper : IDisposable
 	{
+        public string ExecutingPath { get; private set; }
+
 		public bool HasQuery
 			=> (Query.Length > 0);
 
@@ -34,7 +37,8 @@ namespace Gemini.Cgi
             Writer = new StreamWriter(Out, new UTF8Encoding(false));
             //Writer.AutoFlush = true;
             RequestUrl = new Uri(Environment.GetEnvironmentVariable("GEMINI_URL") ?? "about:blank");
-		}
+            ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
 
         //for gemini, its just about removing the new lines
         public string SantiziedQuery
