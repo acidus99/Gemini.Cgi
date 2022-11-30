@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -74,5 +75,21 @@ namespace Gemini.Cgi
 
         public static bool IsRunningAsCgi
             => (Environment.GetEnvironmentVariable("GEMINI_URL") != null);
+
+
+        public string[] GetPathInfoParameters(string route)
+        {
+            if(PathInfo.Length <=route.Length)
+            {
+                return null;
+            }
+            var items = PathInfo.Substring(route.Length).Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if(items.Length == 0)
+            {
+                return null;
+            }
+            return items.Select(x => WebUtility.UrlDecode(x)).ToArray();                    
+        }
+
     }
 }
