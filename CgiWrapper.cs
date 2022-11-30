@@ -31,6 +31,9 @@ namespace Gemini.Cgi
 
 		public Uri RequestUrl { get; private set; }
 
+        public string ScriptName
+            => Environment.GetEnvironmentVariable("SCRIPT_NAME") ?? "";
+
         public CgiWrapper()
 		{
             Out = Console.OpenStandardOutput();
