@@ -92,7 +92,7 @@ namespace Gemini.Cgi
 
         private void HandleException(CgiWrapper cgiWrapper, string msg)
         {
-            cgiWrapper.BadRequest($"Encountered an exception: {msg}");
+            cgiWrapper.Failure($"Encountered an exception: {msg}");
         }
 
         /// <summary>
