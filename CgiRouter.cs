@@ -86,8 +86,7 @@ namespace Gemini.Cgi
 
         private void HandleMissedRoute(CgiWrapper cgiWrapper)
         {
-            cgiWrapper.Success();
-            cgiWrapper.Writer.WriteLine("No routes for request");
+            cgiWrapper.Missing("No routes for request");
         }
 
         private void HandleException(CgiWrapper cgiWrapper, string msg)
