@@ -57,6 +57,9 @@ namespace Gemini.Cgi
         public void Redirect(string url)
             => WriteStatusLine(30, url);
 
+        public void RedirectPermanent(string url)
+            => WriteStatusLine(31, url);
+
         public void Failure(string msg)
             => WriteStatusLine(50, msg);
 
