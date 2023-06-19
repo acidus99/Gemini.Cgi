@@ -14,8 +14,6 @@ namespace Gemini.Cgi
         private readonly List<Tuple<string, RequestCallback>> routeCallbacks = new List<Tuple<string, RequestCallback>>();
         private StaticFileModule staticModule = null;
 
-        private RequestCallback defaultRoute = null;
-
         private Action<CgiWrapper> ParsingCallback;
 
         /// <summary>
@@ -30,14 +28,11 @@ namespace Gemini.Cgi
 
         public void OnRequest(string route, RequestCallback callback)
         {
-            if (route is "")
+            if(string.IsNullOrWhiteSpace(route))
             {
-                defaultRoute = callback;
+                throw new ArgumentException("route not be empty or null", nameof(route));
             }
-            else
-            {
-                routeCallbacks.Add(new Tuple<string, RequestCallback>(route.ToLower(), callback));
-            }
+            routeCallbacks.Add(new Tuple<string, RequestCallback>(route.ToLower(), callback));
         }
 
         public void SetStaticRoot(string relativeDir)
@@ -51,6 +46,14 @@ namespace Gemini.Cgi
             {
                 try
                 {
+                    //always have a / as the base route.
+                    //requests to "/cgi-bin/example.cgi" will be redirected to "/cgi-bin/example.cgi/"
+                    if (cgiWrapper.PathInfo == "")
+                    {
+                        cgiWrapper.RedirectPermanent(cgiWrapper.RequestUrl.AbsolutePath + "/");
+                        return;
+                    }
+
                     if(ParsingCallback != null)
                     {
                         ParsingCallback(cgiWrapper);
@@ -67,14 +70,7 @@ namespace Gemini.Cgi
                     {
                         return;
                     }
-
-                    //finally check default route. If this happens before we check the static module,
-                    //we won't ever server a static file
-                    if(defaultRoute != null && cgiWrapper.PathInfo is "")
-                    {
-                        defaultRoute(cgiWrapper);
-                        return;
-                    }
+             
                     HandleMissedRoute(cgiWrapper);
                 } catch(Exception ex)
                 {
