@@ -81,24 +81,5 @@ namespace Gemini.Cgi
 
         public static bool IsRunningAsCgi
             => (Environment.GetEnvironmentVariable("GEMINI_URL") != null);
-
-
-        public string[] GetPathInfoParameters(string route)
-        {
-            if(PathInfo.Length <=route.Length)
-            {
-                return null;
-            }
-            var items = PathInfo.Substring(route.Length).Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if(items.Length == 0)
-            {
-                return null;
-            }
-            //PATH_INFO, per the CGI spec, has already been URL decoded...
-            //so we won't URL decode it again, since that will convert the "+" which is a valid BASE64 encoded
-            //character into whitespace, which breaks Base64 decoding
-            return items.ToArray();                    
-        }
-
     }
 }
