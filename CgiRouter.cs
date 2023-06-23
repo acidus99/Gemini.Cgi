@@ -7,21 +7,20 @@ using System.Linq;
 
 namespace Gemini.Cgi
 {
-    using RequestCallback = System.Action<CgiWrapper>;
+    using RequestCallback = Action<CgiWrapper>;
 
     public class CgiRouter
     {
         private readonly List<Tuple<string, RequestCallback>> routeCallbacks = new List<Tuple<string, RequestCallback>>();
-        private StaticFileModule staticModule = null;
-
-        private Action<CgiWrapper> ParsingCallback;
+        private StaticFileModule? staticModule;
+        private Action<CgiWrapper>? ParsingCallback;
 
         /// <summary>
         /// Provide an optional callback which is called on incoming requests
         /// helpful for parsing and the nsetting additional variables
         /// </summary>
         /// <param name="parsingCallback"></param>
-        public CgiRouter(Action<CgiWrapper> parsingCallback = null)
+        public CgiRouter(Action<CgiWrapper>? parsingCallback = null)
         {
             ParsingCallback = parsingCallback;
         }
