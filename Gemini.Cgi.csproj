@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <None Remove="README.md" />
+    <None Remove=".gitignore" />
   </ItemGroup>
 </Project>
