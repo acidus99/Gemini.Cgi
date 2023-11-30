@@ -58,7 +58,7 @@ namespace Gemini.Cgi
                         ParsingCallback(cgiWrapper);
                     }
                     //find the route
-                    var callback = FindRoute(cgiWrapper.PathInfo);
+                    var callback = FindExactRoute(cgiWrapper.PathInfo);
                     if (callback != null)
                     {
                         callback(cgiWrapper);
@@ -69,7 +69,15 @@ namespace Gemini.Cgi
                     {
                         return;
                     }
-             
+
+                    //find the route
+                    callback = FindRoute(cgiWrapper.PathInfo);
+                    if (callback != null)
+                    {
+                        callback(cgiWrapper);
+                        return;
+                    }
+
                     HandleMissedRoute(cgiWrapper);
                 } catch(Exception ex)
                 {
@@ -90,6 +98,14 @@ namespace Gemini.Cgi
         }
 
         /// <summary>
+        /// Finds a callback that exactly matches the routeregistered for a route
+        /// </summary>
+        /// <param name="route"></param>
+        private RequestCallback? FindExactRoute(string route)
+            => routeCallbacks.Where(x => route == x.Item1)
+                .Select(x => x.Item2).FirstOrDefault();
+
+        /// <summary>
         /// Finds the first callback that registered for a route
         /// We use "starts with" because we need to support routes that use parts of the path
         /// to pass variables/state (e.g. /search/{language}/{other-options}?search-term
@@ -98,5 +114,6 @@ namespace Gemini.Cgi
         private RequestCallback? FindRoute(string route)
             => routeCallbacks.Where(x => route.StartsWith(x.Item1))
                 .Select(x => x.Item2).FirstOrDefault();
+
     }
 }
