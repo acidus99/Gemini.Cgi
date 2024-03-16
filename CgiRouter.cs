@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-
 using System.Linq;
+using System.Reflection;
 
 namespace Gemini.Cgi;
 
@@ -36,7 +35,7 @@ public class CgiRouter
 
     public void SetStaticRoot(string relativeDir)
     {
-        staticModule = new StaticFileModule(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), relativeDir));
+        staticModule = new StaticFileModule(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, relativeDir));
     }
 
     public void ProcessRequest()

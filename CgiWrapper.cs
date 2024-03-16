@@ -40,7 +40,7 @@ public class CgiWrapper : IDisposable
         Writer = new StreamWriter(Out, new UTF8Encoding(false));
         //Writer.AutoFlush = true;
         RequestUrl = new Uri(Environment.GetEnvironmentVariable("GEMINI_URL") ?? "about:blank");
-        ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
     }
 
     //for gemini, its just about removing the new lines
