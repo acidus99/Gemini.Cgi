@@ -17,8 +17,20 @@ public class CgiWrapper : IDisposable
 
     public StreamWriter Writer { get; private set; }
 
+    /// <summary>
+    /// Is this CGI executing on localhost? Checks by looking at the hostname of the incoming URL.
+    /// </summary>
+    public bool IsLocalHost
+        /*
+         * TODO: This isn't the most robust check. Any 127.* address is technically local host.
+         * It also doesn't work for IPv6. I'm a little limited here since the URL comes in as a string.
+         * This is good enough for what I'm doing (Allowing CGI's to show extra debug info if running
+         * on local host
+         */
+        => RequestUrl.Host == "127.0.0.1" || RequestUrl.Host == "localhost";
+
     public string PathInfo
-            => Environment.GetEnvironmentVariable("PATH_INFO") ?? "";
+        => Environment.GetEnvironmentVariable("PATH_INFO") ?? "";
 
     public string Query
         => WebUtility.UrlDecode(RawQuery);
