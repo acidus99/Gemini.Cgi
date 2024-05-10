@@ -12,11 +12,11 @@ public class CgiRouter
 {
     private readonly List<Tuple<string, RequestCallback>> routeCallbacks = new List<Tuple<string, RequestCallback>>();
     private StaticFileModule? staticModule;
-    private Action<CgiWrapper>? ParsingCallback;
+    private RequestCallback? ParsingCallback;
 
     /// <summary>
     /// Provide an optional callback which is called on incoming requests
-    /// helpful for parsing and the nsetting additional variables
+    /// helpful for parsing and then setting additional variables
     /// </summary>
     /// <param name="parsingCallback"></param>
     public CgiRouter(Action<CgiWrapper>? parsingCallback = null)
@@ -26,7 +26,7 @@ public class CgiRouter
 
     public void OnRequest(string route, RequestCallback callback)
     {
-        if(string.IsNullOrWhiteSpace(route))
+        if (string.IsNullOrWhiteSpace(route))
         {
             throw new ArgumentException("route not be empty or null", nameof(route));
         }
@@ -52,7 +52,7 @@ public class CgiRouter
                     return;
                 }
 
-                if(ParsingCallback != null)
+                if (ParsingCallback != null)
                 {
                     ParsingCallback(cgiWrapper);
                 }
@@ -64,7 +64,7 @@ public class CgiRouter
                     return;
                 }
                 //do we have a static module registered, and was it able to service the request?
-                if(staticModule != null && staticModule.HandleRequest(cgiWrapper))
+                if (staticModule != null && staticModule.HandleRequest(cgiWrapper))
                 {
                     return;
                 }
@@ -78,7 +78,8 @@ public class CgiRouter
                 }
 
                 HandleMissedRoute(cgiWrapper);
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 HandleException(cgiWrapper, ex.Message);
                 cgiWrapper.Writer.WriteLine(ex.StackTrace);

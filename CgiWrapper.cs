@@ -10,8 +10,8 @@ public class CgiWrapper : IDisposable
 {
     public string ExecutingPath { get; private set; }
 
-        public bool HasQuery
-            => (Query.Length > 0);
+    public bool HasQuery
+        => (Query.Length > 0);
 
     public Stream Out { get; private set; }
 
@@ -20,22 +20,22 @@ public class CgiWrapper : IDisposable
     public string PathInfo
             => Environment.GetEnvironmentVariable("PATH_INFO") ?? "";
 
-        public string Query
-            => WebUtility.UrlDecode(RawQuery);
+    public string Query
+        => WebUtility.UrlDecode(RawQuery);
 
-        public string RawQuery
-            => Environment.GetEnvironmentVariable("QUERY_STRING") ?? "";
+    public string RawQuery
+        => Environment.GetEnvironmentVariable("QUERY_STRING") ?? "";
 
-        public string RemoteAddress
-            => Environment.GetEnvironmentVariable("REMOTE_ADDR") ?? "";
+    public string RemoteAddress
+        => Environment.GetEnvironmentVariable("REMOTE_ADDR") ?? "";
 
-        public Uri RequestUrl { get; private set; }
+    public Uri RequestUrl { get; private set; }
 
     public string ScriptName
         => Environment.GetEnvironmentVariable("SCRIPT_NAME") ?? "";
 
     public CgiWrapper()
-        {
+    {
         Out = Console.OpenStandardOutput();
         Writer = new StreamWriter(Out, new UTF8Encoding(false));
         //Writer.AutoFlush = true;
