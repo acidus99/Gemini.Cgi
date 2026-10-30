@@ -4,18 +4,18 @@ namespace Gemini.Cgi;
 
 public class StaticFileModule
 {
-    public string PublicRoot { get; set; } = "";
-
     public StaticFileModule(string publicRootPath)
     {
         PublicRoot = publicRootPath;
     }
 
+    public string PublicRoot { get; set; } = "";
+
     public bool HandleRequest(CgiWrapper cgi)
     {
         //path info can be empty if just requesting the CGI, so add a /
-        var pathInfo = (cgi.PathInfo.Length > 0) ? cgi.PathInfo : "/";
-        string attemptedPath = Path.GetFullPath("." + pathInfo, PublicRoot);
+        var pathInfo = cgi.PathInfo.Length > 0 ? cgi.PathInfo : "/";
+        var attemptedPath = Path.GetFullPath("." + pathInfo, PublicRoot);
         attemptedPath = HandleDefaultFile(attemptedPath);
         if (!attemptedPath.StartsWith(PublicRoot))
         {
@@ -28,6 +28,7 @@ public class StaticFileModule
             SendFile(cgi, attemptedPath);
             return true;
         }
+
         return false;
     }
 
@@ -36,10 +37,7 @@ public class StaticFileModule
     /// </summary>
     private string HandleDefaultFile(string attemptedPath)
     {
-        if (Directory.Exists(attemptedPath))
-        {
-            return attemptedPath + "index.gmi";
-        }
+        if (Directory.Exists(attemptedPath)) return attemptedPath + "index.gmi";
         return attemptedPath;
     }
 
@@ -74,7 +72,7 @@ public class StaticFileModule
     private string ExtensionForFile(string filePath)
     {
         var ext = Path.GetExtension(filePath);
-        return (ext.Length > 1) ? ext.Substring(1) : ext;
+        return ext.Length > 1 ? ext.Substring(1) : ext;
     }
 
     private void SendFile(CgiWrapper cgi, string filePath)
